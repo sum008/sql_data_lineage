@@ -97,33 +97,7 @@ def run_viz(lineage_json):
 
                     {
                     selector: 'node',
-                    style:{                    # Byte-compiled / optimized / DLL files
-                    __pycache__/
-                    *.py[cod]
-                    *$py.class
-                    
-                    # pytest
-                    .pytest_cache/
-                    
-                    # Virtual environments
-                    venv/
-                    env/
-                    ENV/
-                    
-                    # IDE
-                    .vscode/
-                    .idea/
-                    *.swp
-                    *.swo
-                    
-                    # OS
-                    .DS_Store
-                    Thumbs.db
-                    
-                    # Dependencies
-                    *.egg-info/
-                    dist/
-                    build/
+                    style:{
                     'label':'data(id)',
                     'text-wrap':'wrap',
                     'text-max-width':'120px',

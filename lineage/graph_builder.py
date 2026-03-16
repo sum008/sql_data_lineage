@@ -39,7 +39,7 @@ def build_graph(lineage_json_path):
         "edges": edges
     }
 
-if __name__ == "__main__":
-    graph = build_graph("/Users/sumit/Documents/lineage.json")
-    op = json.dumps(graph, indent=2)
-    print(op)
+# if __name__ == "__main__":
+#     graph = build_graph("/Users/sumit/Documents/lineage.json")
+#     op = json.dumps(graph, indent=2)
+#     print(op)
