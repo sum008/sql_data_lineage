@@ -8,6 +8,7 @@ def build_graph(lineage_json_path):
 
     nodes = set()
     edges = []
+    target_to_sources = {}
 
     for entry in data:
 
@@ -22,15 +23,16 @@ def build_graph(lineage_json_path):
             sources = record["source_tables"]
 
             nodes.add(target)
-
             for src in sources:
-
+                target_to_sources.setdefault(target, set()).add(src)
                 nodes.add(src)
 
-                edges.append({
-                    "source": src,
-                    "target": target
-                })
+    for target, sources in target_to_sources.items():
+        for src in sources:
+            edges.append({
+                "source": src,
+                "target": target
+            })        
 
     node_list = [{"id": n} for n in nodes]
 
