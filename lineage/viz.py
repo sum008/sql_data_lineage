@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import uvicorn
 
+from lineage.column_builder import build_column_lineage
 from lineage.graph_builder import build_graph
 from lineage.search import get_upstream_lineage
 
@@ -10,6 +11,8 @@ from lineage.search import get_upstream_lineage
 def run_viz(lineage_json):
 
     graph = build_graph(lineage_json)
+
+    column_lineage = build_column_lineage(lineage_json)
 
     app = FastAPI()
 
@@ -27,6 +30,10 @@ def run_viz(lineage_json):
     @app.get("/lineage/{table}")
     def lineage(table: str):
         return get_upstream_lineage(graph, table)
+    
+    @app.get("/column-lineage/{table}")
+    def renderColumnLineage(table: str):
+        return column_lineage.get(table, {})
 
     print("\nLineage UI running at: http://localhost:8001\n")
 

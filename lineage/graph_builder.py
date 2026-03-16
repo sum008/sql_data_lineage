@@ -1,6 +1,5 @@
 import json
 
-
 def build_graph(lineage_json_path):
 
     with open(lineage_json_path) as f:

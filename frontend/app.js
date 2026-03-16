@@ -1,5 +1,29 @@
 let cy
 
+function renderColumnLineage(data){
+
+    const container = document.getElementById("column-lineage")
+
+    let html = "<h3>Column Lineage</h3>"
+
+    html += "<table>"
+    html += "<tr><th>Target Column</th><th>Source Columns</th></tr>"
+
+    Object.entries(data).forEach(([target, sources]) => {
+
+        html += `
+        <tr>
+            <td><b>${target}</b></td>
+            <td>${sources.join("<br>")}</td>
+        </tr>`
+
+    })
+
+    html += "</table>"
+
+    container.innerHTML = html
+}
+
 function renderGraph(data){
 
     const elements = []
@@ -30,94 +54,135 @@ function renderGraph(data){
         style: [
 
         {
-            selector:'node',
-            style:{
-            'label':'data(id)',
+        selector:'node',
+        style:{
+        'label':'data(id)',
 
-            'color':'white',
-            'font-size':14,
-            'font-weight':'bold',
+        'background-color':'#4f46e5',
+        'color':'white',
 
-            'text-wrap':'wrap',
-            'text-max-width':'120px',
+        'font-size':13,
+        'font-weight':'bold',
 
-            'text-valign':'center',
-            'text-halign':'center',
+        'shape':'round-rectangle',
+        'padding':'16px',
 
-            'background-color':'#1f77b4',
+        'text-valign':'center',
+        'text-halign':'center',
 
-            'shape':'round-rectangle',
+        'width':'label',
+        'height':'label',
 
-            'padding':'20px',
+        'text-wrap':'wrap',
+        'text-max-width':'120px',
 
-            'width':'label',
-            'height':'label',
-
-            'min-width':80,
-            'min-height':40
-            }
-            },
+        'border-width':2,
+        'border-color':'#312e81'
+        }
+        },
+        
+        {
+        selector:'node.selected',
+        style:{
+        'background-color':'#ef4444'
+        }
+        },
 
         {
         selector:'edge',
         style:{
         'curve-style':'bezier',
         'width':2,
-        'line-color':'#888',
+        'line-color':'#94a3b8',
         'target-arrow-shape':'triangle',
-        'target-arrow-color':'#888'
+        'target-arrow-color':'#94a3b8'
         }
         }
 
         ],
 
         layout:{
-        name:'dagre',
-        rankDir:'LR',
-        rankSep:220,
-        nodeSep:150,
-        edgeSep:80
+            name:'dagre',
+            rankDir:'LR',
+            rankSep:220,
+            nodeSep:150,
+            edgeSep:80
         }
 
     })
-    cy.layout({
-    name:'dagre',
-    rankDir:'LR',
-    rankSep:200,
-    nodeSep:120
-}).run()
-}
 
-fetch("/graph")
-.then(r => r.json())
-.then(data => renderGraph(data))
+    const tooltip = document.getElementById("tooltip")
 
+    cy.on('mouseover', 'node', function(evt){
 
-document.getElementById("search").addEventListener("keydown", function(e){
+        const node = evt.target
+        tooltip.style.display = "block"
+        tooltip.innerHTML = node.id()
 
-    if(e.key === "Enter"){
+    })
 
-        const table = e.target.value.trim()
+    cy.on('mousemove', 'node', function(evt){
 
-        if(!table){
-            return
-        }
+        tooltip.style.left = evt.renderedPosition.x + 20 + "px"
+        tooltip.style.top = evt.renderedPosition.y + 20 + "px"
 
-        fetch(`/lineage/${table}`)
-        .then(r => r.json())
-        .then(data => {
-            renderGraph(data)
-        })
-    }
+    })
+
+    cy.on('mouseout', 'node', function(){
+
+        tooltip.style.display = "none"
+
+    })
+
+    cy.on('tap','node', function(evt){
+
+    cy.nodes().removeClass('selected')
+
+    const node = evt.target
+    node.addClass('selected')
+
+    const table = node.id()
+
+    fetch(`/column-lineage/${table}`)
+    .then(r => r.json())
+    .then(data => renderColumnLineage(data))
 
 })
 
-document.getElementById("search").addEventListener("input", function(e){
+}
 
-    if(e.target.value === ""){
-        fetch("/graph")
-        .then(r => r.json())
-        .then(data => renderGraph(data))
-    }
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    fetch("/graph")
+    .then(r => r.json())
+    .then(data => renderGraph(data))
+
+    const search = document.getElementById("search")
+
+    search.addEventListener("keydown", function(e){
+
+        if(e.key === "Enter"){
+
+            const table = e.target.value.trim()
+
+            if(!table) return
+
+            fetch(`/lineage/${table}`)
+            .then(r => r.json())
+            .then(data => renderGraph(data))
+        }
+
+    })
+
+    search.addEventListener("input", function(e){
+
+        if(e.target.value === ""){
+            fetch("/graph")
+            .then(r => r.json())
+            .then(data => renderGraph(data))
+        }
+
+    })
 
 })
