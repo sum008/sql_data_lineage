@@ -42,8 +42,8 @@ def get_upstream_lineage(graph, search_table):
         "edges": edges
     }
 
-if __name__ == "__main__":
-    graph = build_graph("/Users/sumit/Documents/lineage.json")
-    lineage = get_upstream_lineage(graph, "sales_report")
-    json_lineage = json.dumps(lineage, indent=2)
+# if __name__ == "__main__":
+#     graph = build_graph("/Users/sumit/Documents/lineage.json")
+#     lineage = get_upstream_lineage(graph, "sales_report")
+#     json_lineage = json.dumps(lineage, indent=2)
     # print(json_lineage)
