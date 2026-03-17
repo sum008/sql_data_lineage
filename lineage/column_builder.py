@@ -71,7 +71,7 @@ class ColumnLineageBuilder:
         
         for entry in data:
             # Skip entries with errors
-            if "error" in entry:
+            if "error" in entry and entry["error"] is not None:
                 self.logger.warning(
                     f"Skipping {entry.get('file', 'unknown')}: {entry['error']}"
                 )

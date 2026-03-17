@@ -97,7 +97,7 @@ class GraphBuilder:
         lineage_records: List[LineageRecord] = []
         
         for entry in data:
-            if "error" in entry:
+            if "error" in entry and entry["error"] is not None:
                 self.logger.warning(
                     f"Skipping {entry.get('file', 'unknown')}: {entry['error']}"
                 )
@@ -151,3 +151,8 @@ def build_graph(lineage_json_path: str) -> Dict:
     builder = GraphBuilder()
     graph = builder.build_graph_from_json_file(lineage_json_path)
     return graph.to_dict()
+
+
+if __name__ == "__main__":
+    res=build_graph("/Users/sumit/Documents/lineage.json")
+    print(json.dumps(res, indent=2))
