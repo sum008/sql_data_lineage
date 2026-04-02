@@ -1,0 +1,235 @@
+[
+  {
+    "file": "/Users/sumit/Documents/sql_scripts/sql_script1.sql",
+    "lineage": [
+      {
+        "target_table": "sales_report",
+        "source_tables": [
+          "customers",
+          "customers_info",
+          "orders"
+        ],
+        "cte_sources": [
+          "cte",
+          "cte1"
+        ],
+        "column_lineage": [
+          {
+            "target_column": "customer_id",
+            "source_columns": [
+              "cte.customer_id"
+            ]
+          },
+          {
+            "target_column": "revenue",
+            "source_columns": [
+              "cte.amount"
+            ]
+          },
+          {
+            "target_column": "total_quantity",
+            "source_columns": [
+              "cte.quantity"
+            ]
+          },
+          {
+            "target_column": "avg_price",
+            "source_columns": [
+              "cte.amount",
+              "cte.quantity"
+            ]
+          }
+        ]
+      },
+      {
+        "target_table": "sales_summary",
+        "source_tables": [
+          "customers",
+          "customers_info",
+          "orders"
+        ],
+        "cte_sources": [
+          "cte1"
+        ],
+        "column_lineage": [
+          {
+            "target_column": "customer_id",
+            "source_columns": [
+              "customers.customer_id"
+            ]
+          },
+          {
+            "target_column": "revenue",
+            "source_columns": [
+              "customers.amount"
+            ]
+          },
+          {
+            "target_column": "total_quantity",
+            "source_columns": [
+              "customers.quantity"
+            ]
+          },
+          {
+            "target_column": "avg_price",
+            "source_columns": [
+              "customers.amount",
+              "customers.quantity"
+            ]
+          }
+        ]
+      }
+    ],
+    "error": null
+  },
+  {
+    "file": "/Users/sumit/Documents/sql_scripts/sql_script2.sql",
+    "lineage": [
+      {
+        "target_table": "sales_summary",
+        "source_tables": [
+          "customers",
+          "customers_info",
+          "order_fact",
+          "orders"
+        ],
+        "cte_sources": [
+          "cte1"
+        ],
+        "column_lineage": [
+          {
+            "target_column": "customer_id",
+            "source_columns": [
+              "customers.customer_id"
+            ]
+          },
+          {
+            "target_column": "revenue",
+            "source_columns": [
+              "customers.amount"
+            ]
+          },
+          {
+            "target_column": "total_quantity",
+            "source_columns": [
+              "customers.quantity"
+            ]
+          },
+          {
+            "target_column": "avg_price",
+            "source_columns": [
+              "customers.amount",
+              "customers.quantity"
+            ]
+          }
+        ]
+      }
+    ],
+    "error": null
+  },
+  {
+    "file": "/Users/sumit/Documents/sql_scripts/sql_script3.sql",
+    "lineage": [
+      {
+        "target_table": "sales_summary",
+        "source_tables": [
+          "customers",
+          "customers_info",
+          "orders"
+        ],
+        "cte_sources": [
+          "cte",
+          "cte1"
+        ],
+        "column_lineage": [
+          {
+            "target_column": "customer_id",
+            "source_columns": [
+              "cte.customer_id"
+            ]
+          },
+          {
+            "target_column": "revenue",
+            "source_columns": [
+              "cte.amount"
+            ]
+          },
+          {
+            "target_column": "total_quantity",
+            "source_columns": [
+              "cte.quantity"
+            ]
+          },
+          {
+            "target_column": "avg_price",
+            "source_columns": [
+              "cte.amount",
+              "cte.quantity"
+            ]
+          }
+        ]
+      }
+    ],
+    "error": null
+  },
+  {
+    "file": "/Users/sumit/Documents/sql_scripts/sql_script4.sql",
+    "lineage": [
+      {
+        "target_table": "orders",
+        "source_tables": [
+          "order_transaction"
+        ],
+        "cte_sources": [],
+        "column_lineage": [
+          {
+            "target_column": "order_id",
+            "source_columns": [
+              "order_id"
+            ]
+          },
+          {
+            "target_column": "amount",
+            "source_columns": [
+              "order_amount"
+            ]
+          },
+          {
+            "target_column": "quantity",
+            "source_columns": [
+              "order_quantity"
+            ]
+          }
+        ]
+      },
+      {
+        "target_table": "customers",
+        "source_tables": [
+          "dim_customer"
+        ],
+        "cte_sources": [],
+        "column_lineage": [
+          {
+            "target_column": "customer_id",
+            "source_columns": [
+              "customer_id"
+            ]
+          },
+          {
+            "target_column": "customer_name",
+            "source_columns": [
+              "customer_name"
+            ]
+          },
+          {
+            "target_column": "customer_address",
+            "source_columns": [
+              "customer_address"
+            ]
+          }
+        ]
+      }
+    ],
+    "error": null
+  }
+]

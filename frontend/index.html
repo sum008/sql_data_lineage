@@ -71,6 +71,128 @@ th{
     background:#f2f2f2;
 }
 
+/* Tabs styling */
+.tabs-container{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab-button{
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-button:hover{
+    color: #333;
+}
+
+.tab-button.active{
+    color: #4f46e5;
+    border-bottom-color: #4f46e5;
+}
+
+.tab-content{
+    display: none;
+}
+
+.tab-content.active{
+    display: block;
+}
+
+/* Tables Tab styling */
+.tables-container{
+    display: flex;
+    gap: 20px;
+    height: 85vh;
+}
+
+.tables-sidebar{
+    flex: 0 0 300px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+#table-search{
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.tables-list{
+    flex: 1;
+    overflow-y: auto;
+}
+
+.table-item{
+    padding: 10px;
+    margin-bottom: 5px;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.table-item:hover{
+    background: #f0f0f0;
+    border-color: #bbb;
+}
+
+.table-item.selected{
+    background: #4f46e5;
+    color: white;
+    border-color: #4f46e5;
+}
+
+.tables-details{
+    flex: 1;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    overflow: auto;
+}
+
+.table-details-content h3{
+    margin-top: 0;
+    color: #333;
+}
+
+.columns-table{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.columns-table th{
+    background: #f0f0f0;
+    text-align: left;
+    font-weight: 600;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.columns-table td{
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
 </style>
 
 </head>
@@ -79,16 +201,39 @@ th{
 
 <h2>SQL Lineage Explorer</h2>
 
-<input id="search" placeholder="Search table"/>
-
-<div class="main-container">
-
-<div id="cy"></div>
-
-<div id="column-lineage">
-    <h3>Select a table to view column lineage</h3>
+<!-- Tab Navigation -->
+<div class="tabs-container">
+  <button class="tab-button active" data-tab="lineage-tab">Lineage</button>
+  <button class="tab-button" data-tab="tables-tab">Tables</button>
 </div>
-<div id="tooltip"></div>
+
+<!-- Lineage Tab -->
+<div id="lineage-tab" class="tab-content active">
+  <input id="search" placeholder="Search table"/>
+  <div class="main-container">
+    <div id="cy"></div>
+    <div id="column-lineage">
+      <h3>Select a table to view column lineage</h3>
+    </div>
+    <div id="tooltip"></div>
+  </div>
+</div>
+
+<!-- Tables Tab -->
+<div id="tables-tab" class="tab-content">
+  <div class="tables-container">
+    <div class="tables-sidebar">
+      <input id="table-search" placeholder="Search tables..." />
+      <div id="tables-list" class="tables-list">
+        <p>Loading tables...</p>
+      </div>
+    </div>
+    <div class="tables-details">
+      <div id="table-details" class="table-details-content">
+        <p>Select a table to view its columns</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="/static/app.js"></script>

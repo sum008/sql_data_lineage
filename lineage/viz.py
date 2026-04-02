@@ -5,7 +5,9 @@ This module provides a FastAPI web server with REST API endpoints
 for exploring lineage data through an interactive web interface.
 """
 
-from typing import Dict, Optional
+from typing import Dict, Optional, List
+import json
+import os
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
@@ -51,11 +53,53 @@ class LineageVisualizationServer:
             
             self.searcher = GraphSearcher()
             
+            # Build table-to-columns mapping
+            self._build_tables_columns_map()
+            
             self.logger.info("Lineage data loaded successfully")
             
         except (FileProcessError, GraphBuildError) as e:
             self.logger.error(f"Failed to load lineage data: {str(e)}")
             raise
+    
+    def _build_tables_columns_map(self) -> None:
+        """Build a mapping of tables to their columns from the lineage data."""
+        self.tables_columns = {}
+        
+        try:
+            # Load the raw JSON to extract column information
+            with open(self.lineage_json_path, 'r') as f:
+                data = json.load(f)
+            
+            # Extract all tables and their columns from column_lineage
+            for file_entry in data:
+                if file_entry.get('lineage'):
+                    for lineage_item in file_entry['lineage']:
+                        target_table = lineage_item.get('target_table')
+                        if target_table:
+                            if target_table not in self.tables_columns:
+                                self.tables_columns[target_table] = set()
+                            
+                            # Add columns from column_lineage
+                            for col_info in lineage_item.get('column_lineage', []):
+                                target_col = col_info.get('target_column')
+                                if target_col:
+                                    self.tables_columns[target_table].add(target_col)
+                        
+                        # Also add source tables
+                        for source_table in lineage_item.get('source_tables', []):
+                            if source_table not in self.tables_columns:
+                                self.tables_columns[source_table] = set()
+            
+            # Convert sets to sorted lists
+            for table in self.tables_columns:
+                self.tables_columns[table] = sorted(list(self.tables_columns[table]))
+            
+            self.logger.debug(f"Found {len(self.tables_columns)} tables")
+            
+        except Exception as e:
+            self.logger.warning(f"Error building tables-columns map: {str(e)}")
+            self.tables_columns = {}
     
     def create_app(self) -> FastAPI:
         """
@@ -140,6 +184,43 @@ class LineageVisualizationServer:
             self.logger.debug(f"Fetching column lineage for table: {table}")
             
             return self.column_lineage.get(table, {})
+        
+        @app.get("/tables", tags=["API"])
+        def get_tables() -> Dict[str, List[str]]:
+            """
+            Get all tables found in the lineage data.
+            
+            Returns:
+                List of all table names
+            """
+            self.logger.debug("Fetching all tables")
+            tables = sorted(list(self.tables_columns.keys()))
+            return {"tables": tables}
+        
+        @app.get("/tables/{table}/columns", tags=["API"])
+        def get_table_columns(table: str) -> Dict[str, List[str]]:
+            """
+            Get all columns for a specific table.
+            
+            Args:
+                table: Table name
+                
+            Returns:
+                List of column names for the table
+                
+            Raises:
+                HTTPException: If table not found
+            """
+            self.logger.debug(f"Fetching columns for table: {table}")
+            
+            if table not in self.tables_columns:
+                self.logger.warning(f"Table not found: {table}")
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Table '{table}' not found"
+                )
+            
+            return {"columns": self.tables_columns[table]}
         
         return app
 

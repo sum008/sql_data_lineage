@@ -1,4 +1,5 @@
 let cy
+let allTables = []
 
 function renderColumnLineage(data){
 
@@ -151,9 +152,131 @@ function renderGraph(data){
 
 }
 
+// Tab switching functionality
+function setupTabSwitching(){
+    const tabButtons = document.querySelectorAll('.tab-button')
+    const tabContents = document.querySelectorAll('.tab-content')
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabId = button.getAttribute('data-tab')
+            
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'))
+            tabContents.forEach(content => content.classList.remove('active'))
+            
+            // Add active class to clicked button and corresponding content
+            button.classList.add('active')
+            document.getElementById(tabId).classList.add('active')
+        })
+    })
+}
+
+// Render tables list
+function renderTablesList(tables){
+    const container = document.getElementById('tables-list')
+    
+    if(tables.length === 0){
+        container.innerHTML = '<p>No tables found</p>'
+        return
+    }
+    
+    let html = ''
+    tables.forEach(table => {
+        html += `<div class="table-item" data-table="${table}">${table}</div>`
+    })
+    
+    container.innerHTML = html
+    
+    // Add click handlers to table items
+    document.querySelectorAll('.table-item').forEach(item => {
+        item.addEventListener('click', () => {
+            selectTable(item.getAttribute('data-table'))
+        })
+    })
+}
+
+// Display table columns
+function selectTable(tableName){
+    // Update selection styling
+    document.querySelectorAll('.table-item').forEach(item => {
+        item.classList.remove('selected')
+        if(item.getAttribute('data-table') === tableName){
+            item.classList.add('selected')
+        }
+    })
+    
+    // Fetch and display columns
+    fetch(`/tables/${tableName}/columns`)
+    .then(r => r.json())
+    .then(data => {
+        const container = document.getElementById('table-details')
+        
+        let html = `<h3>${tableName}</h3>`
+        
+        if(data.columns.length === 0){
+            html += '<p>No columns found</p>'
+        } else {
+            html += '<table class="columns-table">'
+            html += '<tr><th>Column Name</th></tr>'
+            
+            data.columns.forEach(col => {
+                html += `<tr><td>${col}</td></tr>`
+            })
+            
+            html += '</table>'
+        }
+        
+        container.innerHTML = html
+    })
+    .catch(err => {
+        const container = document.getElementById('table-details')
+        container.innerHTML = `<p>Error loading columns: ${err.message}</p>`
+    })
+}
+
+// Load all tables on Tables tab initialization
+function loadTablesList(){
+    fetch('/tables')
+    .then(r => r.json())
+    .then(data => {
+        allTables = data.tables.sort()
+        renderTablesList(allTables)
+    })
+    .catch(err => {
+        const container = document.getElementById('tables-list')
+        container.innerHTML = `<p>Error loading tables: ${err.message}</p>`
+    })
+}
+
+// Search functionality in tables tab
+function setupTableSearch(){
+    const search = document.getElementById('table-search')
+    
+    search.addEventListener('input', () => {
+        const query = search.value.toLowerCase()
+        
+        if(query === ''){
+            renderTablesList(allTables)
+        } else {
+            const filtered = allTables.filter(table => 
+                table.toLowerCase().includes(query)
+            )
+            renderTablesList(filtered)
+        }
+    })
+}
 
 document.addEventListener("DOMContentLoaded", function(){
 
+    // Initialize tabs
+    setupTabSwitching()
+    
+    // Load tables list for Tables tab
+    loadTablesList()
+    setupTableSearch()
+
+    // Initialize Lineage tab
     fetch("/graph")
     .then(r => r.json())
     .then(data => renderGraph(data))
