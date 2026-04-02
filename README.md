@@ -10,6 +10,7 @@ A comprehensive tool for extracting, analyzing, and visualizing SQL data lineage
 - [Usage](#usage)
   - [Command Line Interface](#command-line-interface)
   - [Web Visualization](#web-visualization)
+- [Screenshots](#screenshots)
 - [Project Structure](#project-structure)
 - [How It Works](#how-it-works)
 - [Examples](#examples)
@@ -135,6 +136,20 @@ Once you run the `viz` command, the application starts a FastAPI server at `http
   - Blue nodes: Tables in the lineage
   - Red nodes: Currently selected table
   - Arrows: Show data flow direction
+
+## Screenshots
+
+### Lineage Graph View
+Interactive graph visualization showing table-to-table dependencies:
+![Lineage Graph](demo/search.png)
+
+### Tables Tab - Browse All Tables
+Navigate and search through all tables in your database:
+![Tables Tab](demo/tables_tab.png)
+
+### Table Details - Column Selection
+Click on any table to view its columns:
+![Table Details](demo/table_click.png)
 
 ## Project Structure
 

@@ -183,17 +183,10 @@ function renderTablesList(tables){
     
     let html = ''
     tables.forEach(table => {
-        html += `<div class="table-item" data-table="${table}">${table}</div>`
+        html += `<div class="table-item" onclick="selectTable('${table}')" data-table="${table}" style="cursor: pointer;">${table}</div>`
     })
     
     container.innerHTML = html
-    
-    // Add click handlers to table items
-    document.querySelectorAll('.table-item').forEach(item => {
-        item.addEventListener('click', () => {
-            selectTable(item.getAttribute('data-table'))
-        })
-    })
 }
 
 // Display table columns

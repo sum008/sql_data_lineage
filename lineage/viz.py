@@ -11,8 +11,10 @@ import os
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from lineage.column_builder import ColumnLineageBuilder
 from lineage.graph_builder import GraphBuilder
@@ -21,6 +23,17 @@ from lineage.config import LoggerSetup, Config, FileProcessError, GraphBuildErro
 
 
 logger = LoggerSetup.get_logger(__name__)
+
+
+class NoCacheMiddleware(BaseHTTPMiddleware):
+    """Middleware to disable caching for development."""
+    
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
 
 class LineageVisualizationServer:
@@ -113,6 +126,9 @@ class LineageVisualizationServer:
             description="Interactive visualization of SQL data lineage",
             version="1.0.0"
         )
+        
+        # Add no-cache middleware
+        app.add_middleware(NoCacheMiddleware)
         
         # Mount static files
         try:
